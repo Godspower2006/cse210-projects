@@ -2,49 +2,82 @@ using System;
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        Console.WriteLine("What is your grade percentage?");
-        string input = Console.ReadLine();
+        // Prompt the user to enter their grade percentage.
+        Console.Write("Enter your grade percentage: ");
+        int percentage = int.Parse(Console.ReadLine());
 
-        if (!int.TryParse(input, out int percent) || percent < 0 || percent > 100)
+        char letter;       // The letter grade (A-F)
+        string sign = "";  // The '+' or '-' modifier
+
+        // Determine the base letter grade (A-F) using if-else
+        if (percentage >= 90)
         {
-            Console.WriteLine("Please enter a valid percentage between 0 and 100.");
-            return;
+            letter = 'A';
         }
-
-        string letter;
-        if (percent >= 90)
-            letter = "A";
-        else if (percent >= 80)
-            letter = "B";
-        else if (percent >= 70)
-            letter = "C";
-        else if (percent >= 60)
-            letter = "D";
+        else if (percentage >= 80)
+        {
+            letter = 'B';
+        }
+        else if (percentage >= 70)
+        {
+            letter = 'C';
+        }
+        else if (percentage >= 60)
+        {
+            letter = 'D';
+        }
         else
-            letter = "F";
-
-        string sign = "";
-        int lastDigit = percent % 10;
-
-        if (letter != "F")
         {
-            if (lastDigit >= 7)
-                sign = "+";
-            else if (lastDigit < 3)
-                sign = "-";
+            letter = 'F';
         }
 
-        // No A+ grades
-        if (letter == "A" && sign == "+")
-            sign = "";
+        // Add '+' or '-' modifiers for B, C, D grades based on the last digit
+        // Do not allow '+' or '-' for 'A' (except A- for below 93) or 'F'.
+        if (letter != 'A' && letter != 'F')
+        {
+            int lastDigit = percentage % 10; // get the last digit of the percentage
+            if (lastDigit >= 7)
+            {
+                sign = "+";
+            }
+            else if (lastDigit < 3)
+            {
+                sign = "-";
+            }
+        }
 
+        // Special rule for 'A': allow A-, but no A+
+        if (letter == 'A')
+        {
+            if (percentage < 93)
+            {
+                sign = "-";
+            }
+            else
+            {
+                sign = ""; // no sign for A (93-100%)
+            }
+        }
+
+        // Special rule for 'F': no '+' or '-' ever
+        if (letter == 'F')
+        {
+            sign = "";
+        }
+
+        // Print the full letter grade with sign
         Console.WriteLine($"Your grade is: {letter}{sign}");
 
-        if (percent >= 70)
-            Console.WriteLine("Congratulations, you passed!");
+        // Check if the student passed (>= 70%) and display message
+        if (percentage >= 70)
+        {
+            Console.WriteLine("You passed the course!");
+        }
         else
-            Console.WriteLine("Better luck next time!");
+        {
+            Console.WriteLine("You failed the course.");
+        }
     }
 }
