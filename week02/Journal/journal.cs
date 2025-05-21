@@ -2,15 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+namespace JournalApp;
+
 public class Journal
 {
     private List<Entry> _entries = new List<Entry>();
 
-    public void AddEntry(Entry entry)
-    {
-        _entries.Add(entry);
-    }
+    // Adds an entry to the internal list
+    public void AddEntry(Entry entry) => _entries.Add(entry);
 
+    // Displays all journal entries
     public void DisplayAll()
     {
         if (_entries.Count == 0)
@@ -18,28 +19,25 @@ public class Journal
             Console.WriteLine("No journal entries found.");
             return;
         }
-
+        Console.WriteLine("\n--- Journal Entries ---");
         foreach (var entry in _entries)
-        {
             entry.Display();
-        }
     }
 
+    // Saves entries to file (delimiter '|' with escaping)
     public void SaveToFile(string filename)
     {
-        using (var writer = new StreamWriter(filename))
+        using StreamWriter writer = new StreamWriter(filename);
+        foreach (var entry in _entries)
         {
-            foreach (var entry in _entries)
-            {
-                // Use '|' as delimiter: date|prompt|response
-                // Escape any '|' in content
-                var line = $"{Escape(entry)}";
-                writer.WriteLine(line);
-            }
+            string safePrompt = entry.Prompt.Replace("|", "\\|");
+            string safeResponse = entry.Response.Replace("|", "\\|");
+            writer.WriteLine($"{entry.Date}|{safePrompt}|{safeResponse}");
         }
-        Console.WriteLine($"Journal saved to {filename}");
+        Console.WriteLine($"Journal saved to '{filename}'");
     }
 
+    // Loads entries from file, reconstructing Entry objects
     public void LoadFromFile(string filename)
     {
         if (!File.Exists(filename))
@@ -47,33 +45,18 @@ public class Journal
             Console.WriteLine($"File '{filename}' not found.");
             return;
         }
-
         _entries.Clear();
-        var lines = File.ReadAllLines(filename);
-        foreach (var line in lines)
+        foreach (var line in File.ReadAllLines(filename))
         {
             var parts = line.Split('|');
             if (parts.Length >= 3)
             {
                 var date = parts[0];
-                var prompt = Unescape(parts[1]);
-                var response = Unescape(parts[2]);
+                var prompt = parts[1].Replace("\\|", "|");
+                var response = parts[2].Replace("\\|", "|");
                 _entries.Add(new Entry(prompt, response, date));
             }
         }
-        Console.WriteLine($"Journal loaded from {filename}");
-    }
-
-    private string Escape(Entry e)
-    {
-        // Access private fields via methods or reflection; for simplicity, build via Display Properties
-        // Assume Entry has getters (or make this method internal)
-        // Here, for demonstration, let's add simple Escape logic placeholder
-        return "";
-    }
-
-    private string Unescape(string text)
-    {
-        return text;
+        Console.WriteLine($"Journal loaded from '{filename}'");
     }
 }
