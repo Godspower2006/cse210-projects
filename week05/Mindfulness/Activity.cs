@@ -1,33 +1,38 @@
 using System;
 using System.Threading;
 
-public class Activity
+public abstract class Activity
 {
     private string _name;
     private string _description;
     private int _duration;
 
-    public Activity(string name, string description)
+    protected Activity(string name, string description)
     {
         _name = name;
         _description = description;
     }
 
-    public void Start()
+    public void Run()
+    {
+        DisplayStartMessage();
+        Execute();
+        DisplayEndMessage();
+    }
+
+    private void DisplayStartMessage()
     {
         Console.Clear();
         Console.WriteLine($"Welcome to the {_name}.");
         Console.WriteLine();
         Console.WriteLine(_description);
         Console.WriteLine();
-        Console.Write("How long, in seconds, would you like for your session? ");
-        int duration = GetDurationFromUser();
-        _duration = duration;
+        _duration = PromptDuration();
         Console.WriteLine("Get ready...");
         ShowSpinner(3);
     }
 
-    public void End()
+    private void DisplayEndMessage()
     {
         Console.WriteLine();
         Console.WriteLine("Well done!");
@@ -37,40 +42,37 @@ public class Activity
         ShowSpinner(3);
     }
 
-    protected int GetDurationFromUser()
+    private int PromptDuration()
     {
+        Console.Write("Enter duration in seconds: ");
         while (true)
         {
             string input = Console.ReadLine();
-            if (int.TryParse(input, out int seconds) && seconds > 0)
+            if (int.TryParse(input, out int result) && result > 0)
             {
-                return seconds;
+                return result;
             }
-            else
-            {
-                Console.Write("Please enter a positive integer: ");
-            }
+            Console.Write("Please enter a positive integer: ");
         }
     }
 
     protected void ShowSpinner(int seconds)
     {
-        string[] spinner = { "|", "/", "-", "\\" };
-        DateTime start = DateTime.Now;
-        DateTime end = start.AddSeconds(seconds);
-        int i = 0;
-        while (DateTime.Now < end)
+        string[] spinner = {"|", "/", "-", "\\"};
+        DateTime endTime = DateTime.Now.AddSeconds(seconds);
+        int index = 0;
+        while (DateTime.Now < endTime)
         {
-            Console.Write(spinner[i]);
+            Console.Write(spinner[index]);
             Thread.Sleep(250);
-            Console.Write("\b \b");
-            i = (i + 1) % spinner.Length;
+            Console.Write("\b ");
+            index = (index + 1) % spinner.Length;
         }
     }
 
-    protected void ShowCountdown(int count)
+    protected void ShowCountdown(int seconds)
     {
-        for (int i = count; i > 0; i--)
+        for (int i = seconds; i > 0; i--)
         {
             Console.Write(i);
             Thread.Sleep(1000);
@@ -78,16 +80,7 @@ public class Activity
         }
     }
 
-    public virtual void Run()
-    {
-        Start();
-        // Derived classes implement their own behavior here.
-        End();
-    }
-
     protected int Duration => _duration;
 
-    protected string Name => _name;
-
-    protected string Description => _description;
+    protected abstract void Execute();
 }

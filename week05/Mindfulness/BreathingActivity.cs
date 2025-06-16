@@ -3,28 +3,26 @@ using System.Threading;
 
 public class BreathingActivity : Activity
 {
-    public BreathingActivity() 
-        : base("Breathing Activity", "This activity will help you relax by guiding you through slow breathing. Clear your mind and focus on your breath.")
+    public BreathingActivity() : base("Breathing Activity", 
+        "This activity will help you relax by walking you through breathing in and out slowly. Clear your mind and focus on your breathing.")
     {
     }
 
-    public override void Run()
+    protected override void Execute()
     {
-        Start();
+        int cycleTime = 6; // One full breath cycle: 3 seconds in, 3 seconds out
+        int cycles = Duration / cycleTime;
 
-        int cycles = Duration / 10; // Each breathing cycle takes about 10 seconds (5 in, 5 out)
         for (int i = 0; i < cycles; i++)
         {
             Console.WriteLine();
             Console.Write("Breathe in... ");
-            ShowCountdown(5);
+            ShowCountdown(3);
             Console.WriteLine();
 
-            Console.Write("Now breathe out... ");
-            ShowCountdown(5);
+            Console.Write("Breathe out... ");
+            ShowCountdown(3);
             Console.WriteLine();
         }
-
-        End();
     }
 }
