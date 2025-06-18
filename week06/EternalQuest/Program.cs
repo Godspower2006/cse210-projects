@@ -1,4 +1,8 @@
 // File: Program.cs
+// Creative Features
+//  • Delete & Edit Goal options added to menu
+//  • Input validation on all numeric entries
+//  • Factory methods (FromString) for deserializing each Goal type
 using System;
 
 namespace EternalQuest
